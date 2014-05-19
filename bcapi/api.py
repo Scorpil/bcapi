@@ -1,84 +1,68 @@
 import requests
-from utils import lazyproperty
+
+from bcapi.resources import Block, Tx, TxOut, Address, MultiAddress
 
 
-class Resource(object):
-    def __init__(self, raw_json):
-        self.raw_json = raw_json
-
-    def __getattr__(self, name):
-        return self.raw_json[name]
-
-
-class Block(Resource):
-    @lazyproperty
-    def tx(self):
-        return [Tx(raw_t, block=self) for raw_t in self.raw_json['tx']]
-
-    def __repr__(self):
-        return "<Block: %s>" % self.hash
-
-
-class Tx(Resource):
-    def __init__(self, raw_json, block=None):
-        super(Tx, self).__init__(raw_json)
-        self.block = block
-
-    @lazyproperty
-    def inputs(self):
-        if self.raw_json['inputs'] and self.raw_json['inputs'][0]:
-            return [TxIn(inputs, tx=self) for inputs in self.raw_json['inputs']]
-        return None
-
-    @lazyproperty
-    def out(self):
-        if self.raw_json['out'] and self.raw_json['out'][0]:
-            return [TxOut(out, tx=self) for out in self.raw_json['out']]
-        return None
-
-    def __repr__(self):
-        return "<Tx: %s>" % self.hash
-
-
-class TxIO(Resource):
-    def __init__(self, raw_json, tx):
-        super(TxIO, self).__init__(raw_json)
-        self.tx = tx
-
-
-class TxIn(TxIO):
-    def __repr__(self):
-        return "<Tx Input: %.5f BTC from %s>" % (self.value / float(100000000), self.addr)
-
-
-class TxOut(TxIO):
-    def __repr__(self):
-        return "<Tx Output: %.5f BTC to %s>" % (self.value / float(100000000), self.addr)
-
-
-class Api(object):
+class DataApi(object):
 
     base_url = "http://blockchain.info/"
 
     @staticmethod
-    def latest_block():
-        block_hash = Api.request('latestblock')['hash']
-        raw_json = Api.request('rawblock', block_hash)
+    def block(block):
+        raw_json = DataApi.request('rawblock', block)
         return Block(raw_json)
 
     @staticmethod
-    def get_block(block):
-        raw_json = Api.request('rawblock', block)
-        return Block(raw_json)
-
-    @staticmethod
-    def get_tx(tx):
-        raw_json = Api.request('rawtx', tx)
+    def tx(tx):
+        raw_json = DataApi.request('rawtx', tx)
         return Tx(raw_json)
 
     @staticmethod
+    def chart_data(chart_type, **kwargs):
+        kwargs.setdefault('format', 'json')
+        return DataApi.request('charts', chart_type, **kwargs)['values']
+
+    @staticmethod
+    def block_height(height, **kwargs):
+        kwargs.setdefault('format', 'json')
+        raw_json = DataApi.request('block-height', height, **kwargs)
+        return [Block(raw_block) for raw_block in raw_json['blocks']]
+
+    @staticmethod
+    def address(address, **kwargs):
+        if isinstance(address, Address):
+            address = address.address
+        raw_json = DataApi.request('rawaddr', address, **kwargs)
+        return Address(raw_json)
+
+    @staticmethod
+    def multi_address(adresses, **kwargs):
+        kwargs['active'] = '|'.join(adresses)
+        raw_json = DataApi.request('multiaddr', **kwargs)
+        return MultiAddress(raw_json)
+
+    @staticmethod
+    def unspent(addresses):
+        if isinstance(adresses, list):
+            addresses = '|'.join(adresses)
+        raw_json = DataApi.request('unspent', active=addresses)
+        return [TxOut(tx_out) for tx_out in raw_json['unspent_outputs']]
+
+    @staticmethod
+    def latest_block():
+        block_hash = DataApi.request('latestblock')['hash']
+        raw_json = DataApi.request('rawblock', block_hash)
+        return Block(raw_json)
+
+    @staticmethod
+    def unconfirmed_txs(**kwargs):
+        kwargs.setdefault('format', 'json')
+        raw_json = DataApi.request('unconfirmed-transactions', **kwargs)
+        return [Tx(raw_tx) for raw_tx in raw_json['txs']]
+
+    @staticmethod
     def request(*args, **kwargs):
-        url = Api.base_url + '/'.join(tuple(map(str, args)))
+        url = DataApi.base_url + '/'.join(tuple(map(str, args)))
         response = requests.get(url, params=kwargs)
         response.raise_for_status()
         return response.json()
