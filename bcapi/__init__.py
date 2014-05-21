@@ -1,1 +1,1 @@
-from bcapi.api import DataApi
+from bcapi.api import *

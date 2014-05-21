@@ -30,7 +30,8 @@ class Tx(Resource):
     @lazyproperty
     def inputs(self):
         if self.raw_json['inputs'] and self.raw_json['inputs'][0]:
-            return [TxIn(inputs, tx=self) for inputs in self.raw_json['inputs']]
+            return [TxIn(inputs, tx=self) for
+                    inputs in self.raw_json['inputs']]
         return None
 
     @lazyproperty
@@ -51,12 +52,14 @@ class TxIO(Resource):
 
 class TxIn(TxIO):
     def __repr__(self):
-        return "<Tx Input: %.5f BTC from %s>" % (self.value / float(100000000), self.addr)
+        return "<Tx Input: %.5f BTC from %s>" % (
+            self.value / float(100000000), self.addr)
 
 
 class TxOut(TxIO):
     def __repr__(self):
-        return "<Tx Output: %.5f BTC to %s>" % (self.value / float(100000000), self.addr)
+        return "<Tx Output: %.5f BTC to %s>" % (
+            self.value / float(100000000), self.addr)
 
 
 class Address(Resource):

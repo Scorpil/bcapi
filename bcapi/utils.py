@@ -12,3 +12,12 @@ def lazyproperty(func):
             return value
         
     return property(_get)
+
+
+class ClassProperty(property):
+    """
+    Subclass property to make classmethod properties possible.
+    Source: http://pastebin.com/aWEVRJBe
+    """
+    def __get__(self, cls, owner):
+        return self.fget.__get__(None, owner)()
