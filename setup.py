@@ -30,7 +30,7 @@ setup(
     install_requires=install_requires,
     tests_require=tests_require,
     zip_safe=True,
-    keywords='bitcoin blockchain api'
+    keywords='bitcoin blockchain api',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',
@@ -42,4 +42,4 @@ setup(
         'Topic :: Software Development',
         'Topic :: System :: Networking',
         'Topic :: Utilities'
-    ],
+    ])

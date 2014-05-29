@@ -2,10 +2,12 @@
 
 **This is tool is under heavy development. Use at your own risk.**
 
-### Api classes
+## Api classes
 
-#### bcapi.DataApi
+### bcapi.DataApi
+
 Wrapper for [Data API](https://blockchain.info/api/blockchain_api):
+
   * **block(block_id)**: Get block info. __block_id__ may be block hash or block index
   * **tx(tx_id)**: Get transaction info. __tx_id__ may be transaction hash or transaction index
   * **block_height(height)**: Get list of blocks at the specified height.
@@ -16,8 +18,10 @@ Wrapper for [Data API](https://blockchain.info/api/blockchain_api):
   * **unconfirmed_txs()**: Get currently unconfirmed transactions.
 
 
-#### bcapi.StatsApi
+### bcapi.StatsApi
+
 Wrapper for [Stats API](https://blockchain.info/api/charts_api):
+
   * __charts(chart_type, **kwargs)__: Returns json values corresponding to the data seen on the requested chart.
   * __stats(**kwargs)__: Returns a JSON object containing the statistics seen on the stats page.
 
@@ -33,14 +37,18 @@ Pass URL parameters as keyword arguments. For example, data for [this chart](htt
 								 address=None)
 
 
-#### bcapi.ExchangeApi
+### bcapi.ExchangeApi
+
 Wrapper for [Exchange Rates API](https://blockchain.info/api/exchange_rates_api):
+
   * **ticker()**: Returns BTC market price.
   * **tobtc(currency, value)**: Convert value in the provided currency to btc.
 
 
-#### bcapi.QueryApi
+### bcapi.QueryApi
+
 Wrapper for [Simple Query API](https://blockchain.info/q):
+
   * **difficulty()**: Current difficulty target as a decimal number.
   * **blockcount()**: Current block height in the longest chain.
   * **latesthash()**: Hash of the latest block.
@@ -56,7 +64,7 @@ Wrapper for [Simple Query API](https://blockchain.info/q):
   * **eta()**: Estimated time until the next block (in seconds).
 
 
-### Resources Abstractions
+## Resources
 
   * **bcapi.resources.Block**: represents block in BlockChain
     * **Block.tx**: block transactions
